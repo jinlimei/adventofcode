@@ -79,5 +79,24 @@ func (d Day) Part1Actual() {
 		panic(err)
 	}
 
-	fmt.Printf("input len is %d\n", len(input))
+	safeReports := 0
+	reports := parse(input)
+	fmt.Printf("Loaded %d reports\n", len(reports))
+
+	for _, report := range reports {
+		safe := report.isSafe()
+
+		fmt.Printf("Report %+v is safe='%v'\n",
+			report.levels,
+			safe,
+		)
+
+		if safe {
+			safeReports++
+		}
+	}
+
+	fmt.Printf("Total Reports: %d\n", len(reports))
+	fmt.Printf("Safe Reports: %d\n", safeReports)
+	fmt.Printf("Percentage Safe: %.2f\n", (float64(safeReports)/float64(len(reports)))*100)
 }
