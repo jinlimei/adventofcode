@@ -41,7 +41,7 @@ the multiplications?
 func (d Day) Part1Prompt() {
 	const mem = `xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))`
 
-	ops := parse(mem)
+	ops := parse(mem, []op{opMult})
 
 	fmt.Println(sumOps(ops))
 }
@@ -53,7 +53,7 @@ func (d Day) Part1Actual() {
 		panic(err)
 	}
 
-	ops := parse(input)
+	ops := parse(input, []op{opMult})
 
 	fmt.Printf("Ops: %d\n", len(ops))
 	fmt.Printf("Sum of Ops: %d\n", sumOps(ops))
