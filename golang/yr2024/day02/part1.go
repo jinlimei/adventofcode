@@ -2,8 +2,6 @@ package day02
 
 import (
 	"fmt"
-
-	"github.com/jinlimei/adventofcode/golang/library/util"
 )
 
 /*
@@ -66,37 +64,12 @@ func (d Day) Part1Prompt() {
 	fmt.Println(reports)
 
 	for _, report := range reports {
-		fmt.Printf("Report %+v is safe='%v'\n",
-			report.levels,
-			report.isSafe(),
-		)
+		fmt.Printf("Report '%+v'", report.levels)
+		safe := report.isSafe(false)
+		fmt.Printf("safe=%v\n", safe)
 	}
 }
 
 func (d Day) Part1Actual() {
-	input, err := util.ReadInputFile(2024, 2)
-	if err != nil {
-		panic(err)
-	}
-
-	safeReports := 0
-	reports := parse(input)
-	fmt.Printf("Loaded %d reports\n", len(reports))
-
-	for _, report := range reports {
-		safe := report.isSafe()
-
-		fmt.Printf("Report %+v is safe='%v'\n",
-			report.levels,
-			safe,
-		)
-
-		if safe {
-			safeReports++
-		}
-	}
-
-	fmt.Printf("Total Reports: %d\n", len(reports))
-	fmt.Printf("Safe Reports: %d\n", safeReports)
-	fmt.Printf("Percentage Safe: %.2f\n", (float64(safeReports)/float64(len(reports)))*100)
+	d.actual(false)
 }
