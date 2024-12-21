@@ -15,7 +15,7 @@ type validReport struct {
 }
 
 func (vr *validReport) isSafeWithDamper() bool {
-	ok, _ := isValidReport(vr.levels)
+	ok := isValidReport(vr.levels)
 	// Simple case: it's already safe without any drastic wildness
 	if ok {
 		return true
@@ -24,23 +24,21 @@ func (vr *validReport) isSafeWithDamper() bool {
 	for pos := 0; pos < len(vr.levels); pos++ {
 		check := buildIntSliceWithoutElement(vr.levels, pos)
 
-		ok, _ = isValidReport(check)
+		ok = isValidReport(check)
 
 		if ok {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
 func (vr *validReport) isSafeSimple() bool {
-	ok, _ := isValidReport(vr.levels)
-
-	return ok
+	return isValidReport(vr.levels)
 }
 
-func isValidReport(levels []int) (bool, int) {
+func isValidReport(levels []int) bool {
 	var (
 		pos      = 0
 		cur      int
@@ -67,15 +65,15 @@ func isValidReport(levels []int) (bool, int) {
 		if startDir == dirUnknown {
 			startDir = currDir
 		} else if startDir != currDir {
-			return false, pos
+			return false
 		}
 
 		diff = util.AbsInt(cur - nxt)
 
 		if diff < 1 || diff > 3 {
-			return false, pos
+			return false
 		}
 	}
 
-	return true, -1
+	return true
 }
