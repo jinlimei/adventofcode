@@ -10,12 +10,18 @@ type op int
 const (
 	opUnk op = iota
 	opMult
+	opDo
+	opDont
 )
 
 func (op op) String() string {
 	switch op {
 	case opMult:
 		return "mul"
+	case opDo:
+		return "do"
+	case opDont:
+		return "don't"
 	default:
 		return "unk"
 	}
@@ -23,34 +29,48 @@ func (op op) String() string {
 
 type instruction struct {
 	op op
-	v1 int64
-	v2 int64
+	a1 int64
+	a2 int64
 }
 
 func (i instruction) String() string {
-	return fmt.Sprintf("%s(%d,%d)", i.op, i.v1, i.v2)
+	return fmt.Sprintf("%s(%d,%d)", i.op, i.a1, i.a2)
 }
 
 func (i instruction) do() int64 {
 	switch i.op {
 	case opMult:
-		return i.v1 * i.v2
+		return i.a1 * i.a2
 	default:
 		return -1
 	}
 }
 
 func sumOps(ops []*instruction) int64 {
-	sum := int64(0)
+	var (
+		sum = int64(0)
+		do  = true
+	)
 
-	for _, o := range ops {
-		sum += o.do()
+	for _, currOp := range ops {
+		switch currOp.op {
+		case opMult:
+			if do {
+				sum += currOp.do()
+			}
+		case opDo:
+			do = true
+		case opDont:
+			do = false
+		default:
+			panic("unhandled default case")
+		}
 	}
 
 	return sum
 }
 
-func parse(input string) []*instruction {
+func parse(input string, validOps []op) []*instruction {
 	var (
 		runes = []rune(input)
 		rLen  = len(runes)
@@ -188,10 +208,36 @@ func parse(input string) []*instruction {
 			}
 
 			pos = nxt
+		case 'd':
+			if isValidOp(opDont, validOps) && findAt(pos, "don't()") {
+				out = append(out, &instruction{opDont, 0, 0})
+				break
+			}
+
+			if isValidOp(opDo, validOps) && findAt(pos, "do()") {
+				out = append(out, &instruction{opDo, 0, 0})
+				break
+			}
 		}
 
 		//fmt.Println()
 	}
 
 	return out
+}
+
+func isValidOp(inp op, validOps []op) bool {
+	var (
+		pos  = 0
+		vLen = len(validOps)
+	)
+
+	for ; pos < vLen; pos++ {
+		if inp == validOps[pos] {
+			//fmt.Printf("op %s is valid\n", inp)
+			return true
+		}
+	}
+
+	return false
 }
