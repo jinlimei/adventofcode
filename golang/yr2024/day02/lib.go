@@ -7,83 +7,60 @@ import (
 	"github.com/jinlimei/adventofcode/golang/library/util"
 )
 
+type direction int
+
+const (
+	dirUnknown direction = iota
+	dirIncreasing
+	dirDecreasing
+)
+
 type validReport struct {
 	levels []int
 }
 
-func (vr *validReport) isSafe(useProblemDampener bool) bool {
+func (vr *validReport) isSafeWithDamper() bool {
+	return false
+}
+
+func (vr *validReport) isSafeSimple() bool {
 	var (
-		pos = 0
-
-		cur     int
-		nxt     int
-		diff    int
-		diffAbs int
-
-		maxLen = len(vr.levels)
-
-		diffs = make([]int, 0)
-
-		numInvalid int
-		numValid   int
-
-		numZero     int
-		numPositive int
-		numNegative int
+		pos      = 0
+		cur      int
+		nxt      int
+		diff     int
+		startDir = dirUnknown
+		currDir  = dirUnknown
+		maxLen   = len(vr.levels)
 	)
 
 	for ; pos < maxLen-1; pos++ {
 		cur = vr.levels[pos]
-		nxt = vr.levels[pos+1]
 
-		diff = cur - nxt
-		diffs = append(diffs, diff)
-
-		diffAbs = util.AbsInt(diff)
-
-		if diffAbs != 0 && (diffAbs < 1 || diffAbs > 3) {
-			numInvalid++
-		} else {
-			numValid++
+		if pos+1 < maxLen {
+			nxt = vr.levels[pos+1]
 		}
 
-		if diff > 0 {
-			numPositive++
-		} else if diff < 0 {
-			numNegative++
+		if cur-nxt > 0 {
+			currDir = dirIncreasing
 		} else {
-			numZero++
+			currDir = dirDecreasing
+		}
+
+		if startDir == dirUnknown {
+			startDir = currDir
+		} else if startDir != currDir {
+			return false
+		}
+
+		diff = util.AbsInt(cur - nxt)
+
+		if diff < 1 || diff > 3 {
+			return false
 		}
 	}
 
-	fmt.Printf("\n  Nums invalid=%d, valid=%d, positive=%d, negative=%d, zero=%d\n", numInvalid, numValid, numPositive, numNegative, numZero)
-
-	var (
-		NegPosOkay   bool
-		InvValidOkay = numInvalid == 0
-	)
-
-	if !useProblemDampener {
-		if numZero == 0 && numNegative == 0 && numPositive > 0 {
-			NegPosOkay = true
-		} else if numZero == 0 && numNegative > 0 && numPositive == 0 {
-			NegPosOkay = true
-		}
-
-	} else {
-
-		if numZero == 0 && numNegative <= 1 && numPositive > 0 {
-			NegPosOkay = true
-		} else if numZero == 0 && numNegative > 0 && numPositive <= 1 {
-			NegPosOkay = true
-		} else if numZero <= 1 && numNegative == 0 && numPositive > 0 {
-			NegPosOkay = true
-		} else if numZero <= 1 && numNegative > 0 && numPositive == 0 {
-			NegPosOkay = true
-		}
-	}
-
-	return NegPosOkay && InvValidOkay
+	return true
 }
 
 func a() {
