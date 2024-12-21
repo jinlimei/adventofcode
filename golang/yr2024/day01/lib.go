@@ -12,11 +12,7 @@ func fileAsString(fileName string) (string, error) {
 }
 
 func absInt(a int) int {
-	if a < 0 {
-		return a * -1
-	}
-
-	return a
+	return util.AbsInt(a)
 }
 
 func distance(pairs [][]int) int {
