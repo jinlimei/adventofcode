@@ -15,12 +15,20 @@ func (d Day) actual(useProblemDamper bool) {
 		panic(err)
 	}
 
-	safeReports := 0
-	reports := parse(input)
+	var (
+		safeReports = 0
+		reports     = parse(input)
+		safe        bool
+	)
+
 	fmt.Printf("Loaded %d reports\n", len(reports))
 
 	for _, report := range reports {
-		safe := report.isSafe(useProblemDamper)
+		if useProblemDamper {
+			safe = report.isSafeWithDamper()
+		} else {
+			safe = report.isSafeSimple()
+		}
 
 		fmt.Printf("Report %+v is safe='%v'\n",
 			report.levels,
@@ -34,5 +42,4 @@ func (d Day) actual(useProblemDamper bool) {
 
 	fmt.Printf("Total Reports: %d\n", len(reports))
 	fmt.Printf("Safe Reports: %d\n", safeReports)
-	fmt.Printf("Percentage Safe: %.2f\n", (float64(safeReports)/float64(len(reports)))*100)
 }
