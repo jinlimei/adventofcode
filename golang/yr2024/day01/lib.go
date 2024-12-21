@@ -1,19 +1,14 @@
 package day01
 
 import (
-	"os"
 	"sort"
 	"strconv"
+
+	"github.com/jinlimei/adventofcode/golang/library/util"
 )
 
 func fileAsString(fileName string) (string, error) {
-	bits, err := os.ReadFile("yr2024/day01/" + fileName)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(bits), nil
+	return util.ReadInputFile(2024, 1)
 }
 
 func absInt(a int) int {
