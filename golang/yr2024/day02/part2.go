@@ -43,8 +43,8 @@ func (d Day) Part2Prompt() {
 	fmt.Println(reports)
 
 	for _, report := range reports {
-		fmt.Printf("Report '%+v'\n", report.levels)
-		safe := report.isSafe(false)
+		fmt.Printf("Report '%+v' ", report.levels)
+		safe := report.isSafe(true)
 		fmt.Printf("Declared safe=%v\n\n", safe)
 	}
 }

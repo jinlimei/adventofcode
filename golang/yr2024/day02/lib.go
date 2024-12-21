@@ -7,133 +7,87 @@ import (
 	"github.com/jinlimei/adventofcode/golang/library/util"
 )
 
-type direction int
-
-func (d direction) String() string {
-	switch d {
-	case 0:
-		return "unknown"
-	case 1:
-		return "increasing"
-	case 2:
-		return "decreasing"
-	default:
-		return "undefined"
-	}
-}
-
-const (
-	dirUnknown direction = iota
-	dirIncreasing
-	dirDecreasing
-)
-
 type validReport struct {
 	levels []int
 }
 
-func (vr *validReport) hasProblem(baseDir direction, cur, nxt int) bool {
-	var (
-		currDir = dirUnknown
-		diff    = cur - nxt
-		absDiff = util.AbsInt(diff)
-	)
-
-	currDir = vr.getDirection(cur, nxt)
-
-	if baseDir != currDir {
-		return true
-	}
-
-	if absDiff < 1 || absDiff > 3 {
-		return true
-	}
-
-	return false
-}
-
-func (vr *validReport) unsafeCount(useProblemDamper bool) int {
+func (vr *validReport) isSafe(useProblemDampener bool) bool {
 	var (
 		pos = 0
 
-		cur int
-		nxt int
-		fut int
-
-		nxtDir = dirUnknown
-		futDir = dirUnknown
+		cur     int
+		nxt     int
+		diff    int
+		diffAbs int
 
 		maxLen = len(vr.levels)
 
-		problems = 0
+		diffs = make([]int, 0)
+
+		numInvalid int
+		numValid   int
+
+		numZero     int
+		numPositive int
+		numNegative int
 	)
 
 	for ; pos < maxLen-1; pos++ {
 		cur = vr.levels[pos]
-		nxt = -1
-		fut = -1
+		nxt = vr.levels[pos+1]
 
-		if pos+1 < maxLen {
-			nxt = vr.levels[pos+1]
+		diff = cur - nxt
+		diffs = append(diffs, diff)
+
+		diffAbs = util.AbsInt(diff)
+
+		if diffAbs != 0 && (diffAbs < 1 || diffAbs > 3) {
+			numInvalid++
+		} else {
+			numValid++
 		}
 
-		if pos+2 < maxLen {
-			fut = vr.levels[pos+2]
-		}
-
-		if nxtDir == dirUnknown {
-			nxtDir = vr.getDirection(cur, nxt)
-			futDir = vr.getDirection(cur, fut)
-		}
-
-		// Do we have a problem?
-		if vr.hasProblem(nxtDir, cur, nxt) {
-			//fmt.Printf("  Problem detected (dir=%+v, cur=%d, nxt=%d)\n", nxtDir, cur, nxt)
-			//
-			//fmt.Printf("  Problem using futDir? %v\n", vr.hasProblem(futDir, cur, nxt))
-			//fmt.Printf("  Problem using fut? %v\n", vr.hasProblem(nxtDir, cur, fut))
-
-			// If we aren't using the problem damper _or_ we can't skip 'nxt'
-			if !useProblemDamper || fut == -1 {
-				fmt.Println("  Recording problem (!useProblemDamper or fut==-1)")
-				problems++
-				continue
-			}
-
-			// If we still have a problem using fut instead of nxt
-			// Special case: pos=0, so 'nxtDir' is invalid if we're skipping nxt
-			if pos == 0 && vr.hasProblem(futDir, cur, fut) {
-				problems++
-				continue
-			}
-
-			// If we still have a problem using fut instead of nxt
-			// Special case: pos>0, so 'nxtDir' is valid
-			if pos > 0 && vr.hasProblem(nxtDir, cur, fut) {
-				problems++
-				continue
-			}
+		if diff > 0 {
+			numPositive++
+		} else if diff < 0 {
+			numNegative++
+		} else {
+			numZero++
 		}
 	}
 
-	return problems
-}
+	fmt.Printf("\n  Nums invalid=%d, valid=%d, positive=%d, negative=%d, zero=%d\n", numInvalid, numValid, numPositive, numNegative, numZero)
 
-func (vr *validReport) getDirection(cur int, nxt int) direction {
-	var currDir direction
+	var (
+		NegPosOkay   bool
+		InvValidOkay = numInvalid == 0
+	)
 
-	//fmt.Printf("getDirection(%d, %d) = %d\n", cur, nxt, cur-nxt)
-	if cur-nxt < 0 {
-		currDir = dirIncreasing
+	if !useProblemDampener {
+		if numZero == 0 && numNegative == 0 && numPositive > 0 {
+			NegPosOkay = true
+		} else if numZero == 0 && numNegative > 0 && numPositive == 0 {
+			NegPosOkay = true
+		}
+
 	} else {
-		currDir = dirDecreasing
+
+		if numZero == 0 && numNegative <= 1 && numPositive > 0 {
+			NegPosOkay = true
+		} else if numZero == 0 && numNegative > 0 && numPositive <= 1 {
+			NegPosOkay = true
+		} else if numZero <= 1 && numNegative == 0 && numPositive > 0 {
+			NegPosOkay = true
+		} else if numZero <= 1 && numNegative > 0 && numPositive == 0 {
+			NegPosOkay = true
+		}
 	}
 
-	return currDir
+	return NegPosOkay && InvValidOkay
 }
 
-func (vr *validReport) isSafe(useProblemDampener bool) bool {
-	return vr.unsafeCount(useProblemDampener) == 0
+func a() {
+	fmt.Print("a")
 }
 
 func parse(input string) []validReport {
