@@ -1,70 +1,25 @@
 package day02
 
 import (
-	"fmt"
 	"strconv"
-
-	"github.com/jinlimei/adventofcode/golang/library/util"
 )
 
-type direction int
-
-const (
-	dirUnknown direction = iota
-	dirIncreasing
-	dirDecreasing
-)
-
-type validReport struct {
-	levels []int
-}
-
-func (vr *validReport) isSafeWithDamper() bool {
-	return false
-}
-
-func (vr *validReport) isSafeSimple() bool {
+func buildIntSliceWithoutElement(old []int, skipEle int) []int {
 	var (
-		pos      = 0
-		cur      int
-		nxt      int
-		diff     int
-		startDir = dirUnknown
-		currDir  = dirUnknown
-		maxLen   = len(vr.levels)
+		oLen = len(old)
+		out  = make([]int, 0, oLen-1)
+		pos  = 0
 	)
 
-	for ; pos < maxLen-1; pos++ {
-		cur = vr.levels[pos]
-
-		if pos+1 < maxLen {
-			nxt = vr.levels[pos+1]
+	for ; pos < oLen; pos++ {
+		if pos == skipEle {
+			continue
 		}
 
-		if cur-nxt > 0 {
-			currDir = dirIncreasing
-		} else {
-			currDir = dirDecreasing
-		}
-
-		if startDir == dirUnknown {
-			startDir = currDir
-		} else if startDir != currDir {
-			return false
-		}
-
-		diff = util.AbsInt(cur - nxt)
-
-		if diff < 1 || diff > 3 {
-			return false
-		}
+		out = append(out, old[pos])
 	}
 
-	return true
-}
-
-func a() {
-	fmt.Print("a")
+	return out
 }
 
 func parse(input string) []validReport {
