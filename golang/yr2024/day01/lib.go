@@ -7,7 +7,7 @@ import (
 )
 
 func fileAsString(fileName string) (string, error) {
-	bits, err := os.ReadFile(fileName)
+	bits, err := os.ReadFile("yr2024/day01/" + fileName)
 
 	if err != nil {
 		return "", err

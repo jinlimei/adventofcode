@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ var days = map[string]aoc.CodeDay{
 
 func main() {
 	if len(os.Args) < 4 {
-		fmt.Println("Usage: go run main.go [01|02] [part1|part2] [prompt|actual]")
+		fmt.Println("Usage: go run runner.go [01|02] [part1|part2] [prompt|actual]")
 		return
 	}
 
@@ -35,7 +35,7 @@ func main() {
 		fmt.Println("day argument must be an integer")
 		return
 	}
-	
+
 	day, ok := days[fmt.Sprintf("%02d", dayInt)]
 	if !ok {
 		fmt.Println("day not found")
