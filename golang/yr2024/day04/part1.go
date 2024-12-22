@@ -52,8 +52,29 @@ Take a look at the little Elf's word search. How many times does XMAS appear?
 */
 
 func (d Day) Part1Prompt() {
-	fmt.Println("Part 1")
-	panic("not implemented")
+	const input = `
+MMMSXXMASM
+MSAMXMSMSA
+AMXSXMAAMM
+MSAMASMSMX
+XMASAMXAMM
+XXAMMXXAMA
+SMSMSASXSS
+SAXAMASAAA
+MAMMMXMMMM
+MXMXAXMASX
+`
+
+	grid := parse(input)
+	visualize(grid)
+
+	fmt.Println()
+	fmt.Println()
+
+	xmasCount, coordsUsed := scanGridForXmas(grid)
+	fmt.Printf("SCAN FOR GRID: %d\n", xmasCount)
+
+	visualizeUsed(grid, coordsUsed)
 }
 
 func (d Day) Part1Actual() {
