@@ -1,6 +1,10 @@
 package day04
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jinlimei/adventofcode/golang/library/util"
+)
 
 /*
 --- Day 4: Ceres Search ---
@@ -72,12 +76,21 @@ MXMXAXMASX
 	fmt.Println()
 
 	xmasCount, coordsUsed := scanGridForXmas(grid)
-	fmt.Printf("SCAN FOR GRID: %d\n", xmasCount)
-
 	visualizeUsed(grid, coordsUsed)
+
+	fmt.Printf("\n\nNumber Of XMAS: %d\n", xmasCount)
 }
 
 func (d Day) Part1Actual() {
-	fmt.Println("Part 1")
-	panic("not implemented")
+	input, err := util.ReadInputFile(2024, 4)
+
+	if err != nil {
+		panic(err)
+	}
+
+	grid := parse(input)
+
+	xmasCount, _ := scanGridForXmas(grid)
+
+	fmt.Printf("\n\nNumber Of XMAS: %d\n", xmasCount)
 }
