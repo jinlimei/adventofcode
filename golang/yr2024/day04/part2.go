@@ -1,6 +1,10 @@
 package day04
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jinlimei/adventofcode/golang/library/util"
+)
 
 /*
 --- Part Two ---
@@ -38,11 +42,41 @@ does an X-MAS appear?
 */
 
 func (d Day) Part2Prompt() {
-	fmt.Println("Part 2")
-	panic("not implemented")
+	const input = `
+MMMSXXMASM
+MSAMXMSMSA
+AMXSXMAAMM
+MSAMASMSMX
+XMASAMXAMM
+XXAMMXXAMA
+SMSMSASXSS
+SAXAMASAAA
+MAMMMXMMMM
+MXMXAXMASX
+`
+
+	grid := parse(input)
+	visualize(grid)
+
+	fmt.Println()
+	fmt.Println()
+
+	masCount, coordsUsed := scanGridForMasThatIsX(grid)
+	visualizeMasUsed(grid, coordsUsed)
+
+	fmt.Printf("\n\nNumber Of MAS that is X: %d\n", masCount)
 }
 
 func (d Day) Part2Actual() {
-	fmt.Println("Part 2")
-	panic("not implemented")
+	input, err := util.ReadInputFile(2024, 4)
+
+	if err != nil {
+		panic(err)
+	}
+
+	grid := parse(input)
+
+	masCount, _ := scanGridForMasThatIsX(grid)
+
+	fmt.Printf("\n\nNumber Of MAS taht is X: %d\n", masCount)
 }

@@ -66,9 +66,83 @@ func (xy xycoord) String() string {
 	return fmt.Sprintf("(%d,%d)", xy.x, xy.y)
 }
 
-type peekResult struct {
+type xmasPeekResult struct {
 	values [4]uint8
 	coords [4]xycoord
+}
+
+const (
+	masCenter      = 0
+	masTopLeft     = 1
+	masTopRight    = 2
+	masBottomLeft  = 3
+	masBottomRight = 4
+)
+
+// masThatIsXPeekResult is for part2 of day 4.
+// For values and coords this is the 0-4!
+// peek 0 is the center
+// peek 1 top left
+// peek 2 is top right
+// peek 3 is bottom left
+// peek 4 is bottom right
+type masThatIsXPeekResult struct {
+	start  xycoord
+	values [5]uint8
+	coords [5]xycoord
+}
+
+func scanGridForMasThatIsX(grid [][]uint8) (int, []masThatIsXPeekResult) {
+	var (
+		gridLen    = len(grid)
+		validPeeks = make([]masThatIsXPeekResult, 0)
+		masCount   = 0
+	)
+
+	// We can probably start at 1,1 instead of 0,0
+	// to speed up a little since there's no way
+	// to find this in the 0,0 area.
+	//
+	// We can also skip the very last column/row
+	// to speed up a little there too!
+
+	for x := 1; x < gridLen-1; x++ {
+		var (
+			row  = grid[x]
+			cLen = len(row)
+		)
+
+		for y := 1; y < cLen-1; y++ {
+			peekedStar := peekStar(x, y, grid)
+
+			if isMasThatIsX(peekedStar.values) {
+				validPeeks = append(validPeeks, peekedStar)
+				masCount++
+			}
+		}
+	}
+
+	return masCount, validPeeks
+}
+
+func peekStar(x, y int, grid [][]uint8) masThatIsXPeekResult {
+	return masThatIsXPeekResult{
+		start: xycoord{x, y},
+		values: [5]uint8{
+			peekXY(x, y, grid),
+			peekXY(x-1, y+1, grid),
+			peekXY(x+1, y+1, grid),
+			peekXY(x-1, y-1, grid),
+			peekXY(x+1, y-1, grid),
+		},
+		coords: [5]xycoord{
+			{x, y},
+			{x - 1, y + 1},
+			{x + 1, y + 1},
+			{x - 1, y - 1},
+			{x + 1, y - 1},
+		},
+	}
 }
 
 func scanGridForXmas(grid [][]uint8) (int, [][4]xycoord) {
@@ -190,8 +264,8 @@ func peekXY(x, y int, grid [][]uint8) uint8 {
 	return grid[x][y]
 }
 
-func peekToRight(x, y int, row []uint8) peekResult {
-	return peekResult{
+func peekToRight(x, y int, row []uint8) xmasPeekResult {
+	return xmasPeekResult{
 		[4]uint8{
 			peekY(y+0, row),
 			peekY(y+1, row),
@@ -206,8 +280,8 @@ func peekToRight(x, y int, row []uint8) peekResult {
 	}
 }
 
-func peekToLeft(x, y int, row []uint8) peekResult {
-	return peekResult{
+func peekToLeft(x, y int, row []uint8) xmasPeekResult {
+	return xmasPeekResult{
 		[4]uint8{
 			peekY(y-0, row),
 			peekY(y-1, row),
@@ -222,8 +296,8 @@ func peekToLeft(x, y int, row []uint8) peekResult {
 	}
 }
 
-func peekDown(x, y int, grid [][]uint8) peekResult {
-	return peekResult{
+func peekDown(x, y int, grid [][]uint8) xmasPeekResult {
+	return xmasPeekResult{
 		[4]uint8{
 			peekXY(x+0, y, grid),
 			peekXY(x+1, y, grid),
@@ -240,8 +314,8 @@ func peekDown(x, y int, grid [][]uint8) peekResult {
 
 }
 
-func peekUp(x, y int, grid [][]uint8) peekResult {
-	return peekResult{
+func peekUp(x, y int, grid [][]uint8) xmasPeekResult {
+	return xmasPeekResult{
 		[4]uint8{
 			peekXY(x-0, y, grid),
 			peekXY(x-1, y, grid),
@@ -257,8 +331,8 @@ func peekUp(x, y int, grid [][]uint8) peekResult {
 	}
 }
 
-func peekToTopRight(x, y int, grid [][]uint8) peekResult {
-	return peekResult{
+func peekToTopRight(x, y int, grid [][]uint8) xmasPeekResult {
+	return xmasPeekResult{
 		[4]uint8{
 			peekXY(x-0, y+0, grid),
 			peekXY(x-1, y+1, grid),
@@ -273,8 +347,8 @@ func peekToTopRight(x, y int, grid [][]uint8) peekResult {
 	}
 }
 
-func peekToBottomRight(x, y int, grid [][]uint8) peekResult {
-	return peekResult{
+func peekToBottomRight(x, y int, grid [][]uint8) xmasPeekResult {
+	return xmasPeekResult{
 		[4]uint8{
 			peekXY(x+0, y+0, grid),
 			peekXY(x+1, y+1, grid),
@@ -289,8 +363,8 @@ func peekToBottomRight(x, y int, grid [][]uint8) peekResult {
 	}
 }
 
-func peekToBottomLeft(x, y int, grid [][]uint8) peekResult {
-	return peekResult{
+func peekToBottomLeft(x, y int, grid [][]uint8) xmasPeekResult {
+	return xmasPeekResult{
 		[4]uint8{
 			peekXY(x+0, y-0, grid),
 			peekXY(x+1, y-1, grid),
@@ -305,8 +379,8 @@ func peekToBottomLeft(x, y int, grid [][]uint8) peekResult {
 	}
 }
 
-func peekToTopLeft(x, y int, grid [][]uint8) peekResult {
-	return peekResult{
+func peekToTopLeft(x, y int, grid [][]uint8) xmasPeekResult {
+	return xmasPeekResult{
 		[4]uint8{
 			peekXY(x-0, y-0, grid),
 			peekXY(x-1, y-1, grid),
@@ -339,4 +413,35 @@ func isXMAS(peeked [4]uint8) bool {
 	}
 
 	return true
+}
+
+func isMasThatIsX(peeked [5]uint8) bool {
+	okays := 0
+
+	// The center must *always* be A
+	if peeked[masCenter] == 'A' {
+		okays++
+	}
+
+	if peeked[masTopLeft] == 'M' && peeked[masBottomRight] == 'S' {
+		okays++
+	} else if peeked[masTopLeft] == 'S' && peeked[masBottomRight] == 'M' {
+		okays++
+	}
+
+	if peeked[masTopRight] == 'S' && peeked[masBottomLeft] == 'M' {
+		okays++
+	} else if peeked[masTopRight] == 'M' && peeked[masBottomLeft] == 'S' {
+		okays++
+	}
+
+	if okays == 3 {
+		// This should be fine then! Woohoo!
+		//fmt.Printf("PASS: %s, %s, %s, %s, %s\n",
+		//	string(peeked[0]), string(peeked[1]), string(peeked[2]),
+		//	string(peeked[3]), string(peeked[4]))
+		return true
+	}
+
+	return false
 }
