@@ -139,7 +139,10 @@ func (d Day) Part1Prompt() {
 97,13,75,29,47
 `
 
-	spew.Dump(parse(input))
+	rules, updates := parse(input)
+	//spew.Dump(rules)
+
+	spew.Dump(validate(rules, updates))
 }
 
 func (d Day) Part1Actual() {

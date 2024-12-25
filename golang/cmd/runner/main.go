@@ -24,7 +24,7 @@ var days = map[string]aoc.CodeDay{
 
 func main() {
 	if len(os.Args) < 4 {
-		fmt.Println("Usage: go run ./cmd/runner [01|02] [part1|part2] [prompt|actual]")
+		fmt.Println("Usage: go run ./cmd/runner [1-x] [part1|part2] [prompt|actual]")
 		return
 	}
 
