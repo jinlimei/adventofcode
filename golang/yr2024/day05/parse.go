@@ -1,16 +1,39 @@
 package day05
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
 
-type orderingRule struct {
-	page   int
-	before int
+type update []int
+
+func (u update) String() string {
+	var (
+		buf  strings.Builder
+		uLen = len(u)
+	)
+
+	for idx, val := range u {
+		buf.WriteString(strconv.Itoa(val))
+		if idx+1 < uLen {
+			buf.WriteRune(',')
+		}
+	}
+
+	return buf.String()
 }
 
-func parse(input string) ([]orderingRule, [][]int) {
+type orderingRule struct {
+	num0 int
+	num1 int
+}
+
+func (or orderingRule) String() string {
+	return fmt.Sprintf("%d|%d", or.num0, or.num1)
+}
+
+func parse(input string) ([]orderingRule, []update) {
 	parts := strings.Split(input, "\n\n")
 
 	return parseOrderingRules(parts[0]),
@@ -27,11 +50,11 @@ func parseOrderingRules(input string) []orderingRule {
 
 		afterPipe = false
 
-		page   int
-		before int
+		num1 int
+		num0 int
 
-		pageRune   = make([]rune, 0, 2)
-		beforeRune = make([]rune, 0, 2)
+		num0Rune = make([]rune, 0, 2)
+		num1Rune = make([]rune, 0, 2)
 
 		configs = make([]orderingRule, 0)
 
@@ -44,36 +67,33 @@ func parseOrderingRules(input string) []orderingRule {
 		switch chr {
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			if afterPipe {
-				pageRune = append(pageRune, chr)
+				num0Rune = append(num0Rune, chr)
 			} else {
-				beforeRune = append(beforeRune, chr)
+				num1Rune = append(num1Rune, chr)
 			}
 		case '|':
 			afterPipe = true
-			before, _ = strconv.Atoi(string(beforeRune))
+			num0, _ = strconv.Atoi(string(num1Rune))
 
-			config.before = before
-
-			beforeRune = make([]rune, 0, 2)
-
+			config.num0 = num0
 		case '\n':
 			if !afterPipe {
 				break
 			}
 
-			page, _ = strconv.Atoi(string(pageRune))
+			num1, _ = strconv.Atoi(string(num0Rune))
 
-			config.page = page
+			config.num1 = num1
 
-			if page > 0 && before > 0 {
+			if num1 > 0 && num0 > 0 {
 				configs = append(configs, config)
 			}
 
-			pageRune = make([]rune, 0, 2)
-			beforeRune = make([]rune, 0, 2)
+			num0Rune = make([]rune, 0, 2)
+			num1Rune = make([]rune, 0, 2)
 
-			page = 0
-			before = 0
+			num1 = 0
+			num0 = 0
 			afterPipe = false
 		}
 	}
@@ -81,7 +101,7 @@ func parseOrderingRules(input string) []orderingRule {
 	return configs
 }
 
-func parsePageNumberUpdates(input string) [][]int {
+func parsePageNumberUpdates(input string) []update {
 	var (
 		runes = []rune(input)
 		rLen  = len(runes)
@@ -89,8 +109,8 @@ func parsePageNumberUpdates(input string) [][]int {
 		pos = 0
 		chr rune
 
-		lines = make([][]int, 0)
-		line  = make([]int, 0)
+		lines = make([]update, 0)
+		line  = make(update, 0)
 
 		numRunes = make([]rune, 0, 2)
 		num      int

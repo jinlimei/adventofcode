@@ -2,8 +2,7 @@ package day05
 
 import (
 	"fmt"
-
-	"github.com/davecgh/go-spew/spew"
+	"github.com/jinlimei/adventofcode/golang/library/util"
 )
 
 /*
@@ -94,9 +93,9 @@ For some reason, the Elves also need to know the middle page number of each upda
 currently only printing the correctly-ordered updates, you will need to find the middle page number of each
 correctly-ordered update. In the above example, the correctly-ordered updates are:
 
-75,47,61,53,29
-97,61,53,29,13
-75,29,13
+75,47,*61*,53,29
+97,61,*53*,29,13
+75,*29*,13
 
 These have middle page numbers of 61, 53, and 29 respectively. Adding these page numbers together gives 143.
 
@@ -142,10 +141,28 @@ func (d Day) Part1Prompt() {
 	rules, updates := parse(input)
 	//spew.Dump(rules)
 
-	spew.Dump(validate(rules, updates))
+	valid, _ := validate(rules, updates)
+	for _, v := range valid {
+		fmt.Println(v)
+	}
+
+	fmt.Println(sumMids(valid))
+
+	//spew.Dump(validate(rules, []update{
+	//	{75, 97, 47, 61, 53},
+	//}))
 }
 
 func (d Day) Part1Actual() {
-	fmt.Println("Part 1")
-	panic("not implemented")
+	input, err := util.ReadInputFile(2024, 5)
+
+	if err != nil {
+		panic(err)
+	}
+
+	rules, updates := parse(input)
+
+	valid, _ := validate(rules, updates)
+
+	fmt.Println(sumMids(valid))
 }
