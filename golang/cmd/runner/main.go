@@ -12,6 +12,7 @@ import (
 	"github.com/jinlimei/adventofcode/golang/yr2024/day03"
 	"github.com/jinlimei/adventofcode/golang/yr2024/day04"
 	"github.com/jinlimei/adventofcode/golang/yr2024/day05"
+	"github.com/jinlimei/adventofcode/golang/yr2024/day06"
 )
 
 var days = map[string]aoc.CodeDay{
@@ -20,6 +21,7 @@ var days = map[string]aoc.CodeDay{
 	"03": &day03.Day{},
 	"04": &day04.Day{},
 	"05": &day05.Day{},
+	"06": &day06.Day{},
 }
 
 func main() {
