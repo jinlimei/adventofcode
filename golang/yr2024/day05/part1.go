@@ -147,10 +147,6 @@ func (d Day) Part1Prompt() {
 	}
 
 	fmt.Println(sumMids(valid))
-
-	//spew.Dump(validate(rules, []update{
-	//	{75, 97, 47, 61, 53},
-	//}))
 }
 
 func (d Day) Part1Actual() {

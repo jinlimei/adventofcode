@@ -1,11 +1,16 @@
 package day05
 
+import (
+	"slices"
+)
+
 // validate operations for part1 (at time of writing, anyway, part2 may be different)
 //
 // 1. Identify which updates are already in the *right* order.
-func validate(rules []orderingRule, updates []update) ([]update, bool) {
+func validate(rules []orderingRule, updates []update) ([]update, []update) {
 	var (
-		out = make([]update, 0)
+		goodOut = make([]update, 0)
+		badOut  = make([]update, 0)
 	)
 
 	for _, u := range updates {
@@ -36,13 +41,31 @@ func validate(rules []orderingRule, updates []update) ([]update, bool) {
 			}
 		}
 
-		if !anyInvalid {
-			out = append(out, u)
+		if anyInvalid {
+			badOut = append(badOut, u)
+		} else {
+			goodOut = append(goodOut, u)
 		}
 
 	}
 
-	return out, false
+	return goodOut, badOut
+}
+
+func fixInvalid(rules []orderingRule, invalidUpdates []update) []update {
+	for _, invalid := range invalidUpdates {
+		slices.SortFunc(invalid, func(num0, num1 int) int {
+			for _, rule := range rules {
+				if rule.num0 == num0 && rule.num1 == num1 {
+					return -1
+				}
+			}
+
+			return 0
+		})
+	}
+
+	return invalidUpdates
 }
 
 func getMid(u update) int {
