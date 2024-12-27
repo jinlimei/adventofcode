@@ -63,6 +63,11 @@ func (gm *guardMap) getObjectAtPos(x, y int) coordObject {
 	return coordNothing
 }
 
+func (gm *guardMap) distinctPositions() int {
+	// the +1 is necessary for the *existing* position of the guard.
+	return len(gm.walkPaths) + 1
+}
+
 func (gm *guardMap) traverse() {
 	var (
 		pos xyCoord
@@ -77,7 +82,16 @@ func (gm *guardMap) traverse() {
 		// We've completed our routine, as we've walked off the map
 		// and presumably off a cliff and/or into the ocean.
 		if !gm.isValidCoords(pos) {
-			fmt.Printf("OH NO THE GUARD FELL OFF A CLIFF AND/OR INTO THE OCEAN: %s", pos.String())
+			fmt.Printf("OH NO THE GUARD FELL OFF A CLIFF AND/OR INTO THE OCEAN: %s\n", pos.String())
+			fmt.Printf("WHAT IS %s\n", gm.getObjectAtPos(pos.x, 0))
+
+			fmt.Printf("ROW %d\n", pos.x)
+			for k := 0; k < gm.maxCoord.y; k++ {
+				fmt.Printf("%s", gm.getObjectAtPos(pos.x, k))
+			}
+
+			fmt.Println()
+
 			// we'll still place the guard off into nowhere
 			gm.guard.loc = pos
 			break
@@ -89,7 +103,7 @@ func (gm *guardMap) traverse() {
 			// let's record our walk position
 			gm.walkPaths = append(gm.walkPaths, pos)
 			gm.guard.loc = pos
-			gm.guard.uniqueSteps++
+			gm.guard.steps++
 		case coordObstacle:
 			// we are not fine to proceed we need to change direction
 			gm.guard.facing = gm.guard.facing.turnRight()
@@ -97,7 +111,7 @@ func (gm *guardMap) traverse() {
 			// it's fine that we're walking
 			// but we won't re-record the walk path
 			gm.guard.loc = pos
-			//gm.guard.uniqueSteps++
+			gm.guard.steps++
 		case coordGuard:
 			panic("what the actual fuck we've talked into ourselves, burn everything down")
 		default:

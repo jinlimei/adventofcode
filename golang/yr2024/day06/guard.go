@@ -7,7 +7,7 @@ import (
 type theGuard struct {
 	start       xyCoord
 	loc         xyCoord
-	uniqueSteps int
+	steps       int
 	facing      guardDirection
 	startFacing guardDirection
 }
@@ -40,13 +40,14 @@ func (tg *theGuard) String() string {
 func (tg *theGuard) reset() {
 	tg.loc = tg.start
 	tg.facing = tg.startFacing
-	tg.uniqueSteps = 0
+	tg.steps = 0
 }
 
 type guardDirection uint8
 
 const (
-	facingNorth guardDirection = iota
+	facingUnknown guardDirection = iota
+	facingNorth
 	facingEast
 	facingSouth
 	facingWest

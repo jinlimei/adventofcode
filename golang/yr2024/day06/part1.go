@@ -135,10 +135,12 @@ func (d Day) Part1Prompt() {
 	gMap.visualize()
 
 	fmt.Println("\nTRAVERSING:")
+
 	gMap.traverse()
+
 	gMap.visualize()
 
-	fmt.Printf("\nGuard Walked to %d Distinct Spots\n", gMap.guard.uniqueSteps)
+	fmt.Printf("\nGuard Walked to %d Distinct Spots\n", gMap.distinctPositions())
 }
 
 func (d Day) Part1Actual() {
@@ -156,7 +158,7 @@ func (d Day) Part1Actual() {
 
 	gMap.traverse()
 
-	//gMap.visualize()
+	gMap.visualize()
 
-	fmt.Printf("\nGuard Walked to %d Distinct Spots\n", gMap.guard.uniqueSteps)
+	fmt.Printf("\nGuard Walked to %d Distinct Spots\n", gMap.distinctPositions())
 }
