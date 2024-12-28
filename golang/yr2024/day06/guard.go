@@ -37,6 +37,16 @@ func (tg *theGuard) String() string {
 	)
 }
 
+func (tg *theGuard) clone() *theGuard {
+	return &theGuard{
+		start:       tg.start.clone(),
+		loc:         tg.loc.clone(),
+		steps:       tg.steps,
+		facing:      tg.facing,
+		startFacing: tg.startFacing,
+	}
+}
+
 func (tg *theGuard) reset() {
 	tg.loc = tg.start
 	tg.facing = tg.startFacing

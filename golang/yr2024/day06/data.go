@@ -11,6 +11,7 @@ const (
 	coordObstacle
 	coordWalkPath
 	coordGuard
+	coordTempObstacle
 )
 
 func (co coordObject) String() string {
@@ -23,6 +24,8 @@ func (co coordObject) String() string {
 		return "X"
 	case coordGuard:
 		return "g"
+	case coordTempObstacle:
+		return "O"
 	default:
 		panic("invalid coordObject")
 	}
@@ -32,20 +35,30 @@ type xyCoord struct {
 	x, y int
 }
 
+func (xy *xyCoord) clone() xyCoord {
+	return xyCoord{
+		x: xy.x,
+		y: xy.y,
+	}
+}
+
 func (xy *xyCoord) String() string {
 	return fmt.Sprintf("(%d,%d)", xy.x, xy.y)
 }
 
 type guardMap struct {
-	maxCoord  xyCoord
-	guard     *theGuard
-	obstacles []xyCoord
-	walkPaths []xyCoord
+	maxCoord      xyCoord
+	guard         *theGuard
+	tempObstacle  *xyCoord
+	obstacles     []xyCoord
+	walkPaths     []xyCoord
+	tempObstacles []xyCoord
 }
 
 func (gm *guardMap) getObjectAtPos(x, y int) coordObject {
-	if gm.guard.loc.x == x && gm.guard.loc.y == y {
-		return coordGuard
+	// Handle temporary obstacles.
+	if gm.tempObstacle != nil && gm.tempObstacle.x == x && gm.tempObstacle.y == y {
+		return coordObstacle
 	}
 
 	for _, obstacle := range gm.obstacles {
@@ -60,12 +73,101 @@ func (gm *guardMap) getObjectAtPos(x, y int) coordObject {
 		}
 	}
 
+	for _, tempObstacle := range gm.tempObstacles {
+		if tempObstacle.x == x && tempObstacle.y == y {
+			return coordTempObstacle
+		}
+	}
+
+	if gm.guard.loc.x == x && gm.guard.loc.y == y {
+		return coordGuard
+	}
+
 	return coordNothing
 }
 
 func (gm *guardMap) distinctPositions() int {
 	// the +1 is necessary for the *existing* position of the guard.
 	return len(gm.walkPaths) + 1
+}
+
+func (gm *guardMap) findLoopObstacles() {
+	var (
+		pos xyCoord
+
+		obstacles = make([]xyCoord, 0)
+	)
+
+	gm.guard.reset()
+
+	for {
+		pos = gm.guard.coordsInFront()
+
+		// we failed to find a loop
+		if !gm.isValidCoords(pos) {
+			break
+		}
+
+		switch gm.getObjectAtPos(pos.x, pos.y) {
+		case coordNothing, coordWalkPath, coordGuard:
+			gm.tempObstacle = &xyCoord{pos.x, pos.y}
+
+			if gm.isInLoop(gm.guard.facing, gm.guard.loc) {
+				obstacles = append(obstacles, xyCoord{pos.x, pos.y})
+			}
+
+			gm.tempObstacle = nil
+			gm.guard.loc = pos
+		case coordObstacle:
+			gm.guard.facing = gm.guard.facing.turnRight()
+		default:
+			panic("invalid coord object")
+		}
+	}
+
+	gm.tempObstacles = obstacles
+}
+
+func (gm *guardMap) isInLoop(facing guardDirection, pos xyCoord) bool {
+	guard := &theGuard{
+		start:       pos,
+		loc:         pos,
+		steps:       0,
+		facing:      facing,
+		startFacing: facing,
+	}
+
+	returnedToStart := false
+
+	// Do we return to our start position!
+walkLoop:
+	for {
+		pos = guard.coordsInFront()
+
+		if !gm.isValidCoords(pos) {
+			break
+		}
+
+		if pos.x == guard.start.x && pos.y == guard.start.y {
+			returnedToStart = true
+			break
+		}
+
+		switch gm.getObjectAtPos(pos.x, pos.y) {
+		case coordNothing, coordWalkPath:
+			guard.loc = pos
+			guard.steps++
+		case coordObstacle:
+			guard.facing = guard.facing.turnRight()
+		case coordGuard:
+			returnedToStart = true
+			break walkLoop
+		default:
+			panic("invalid coord object")
+		}
+	}
+
+	return returnedToStart
 }
 
 func (gm *guardMap) traverse() {
@@ -115,7 +217,7 @@ func (gm *guardMap) traverse() {
 		case coordGuard:
 			panic("what the actual fuck we've talked into ourselves, burn everything down")
 		default:
-			panic("unhandled default case")
+			panic("invalid coord object")
 		}
 	}
 }
