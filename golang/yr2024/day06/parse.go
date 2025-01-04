@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-func parseGuardDirection(g rune) guardDirection {
+func parseGuardDirection(g rune) direction {
 	switch g {
 	case '^':
 		return facingNorth
@@ -19,7 +19,7 @@ func parseGuardDirection(g rune) guardDirection {
 	}
 }
 
-func parse(input string) *guardMap {
+func parse(input string) *nMap {
 	// Let's simplify the parsing here and avoid having to deal
 	// with empty newlines at start since I love doing that for Part1Prompt/Part2Prompt
 	input = strings.TrimSpace(input) + "\n"
@@ -33,11 +33,7 @@ func parse(input string) *guardMap {
 
 		xPos = 0
 
-		gMap = &guardMap{
-			guard:     &theGuard{},
-			obstacles: make([]xyCoord, 0),
-			walkPaths: make([]xyCoord, 0),
-		}
+		nm = initMap()
 
 		maxX = 0
 		maxY = 0
@@ -52,7 +48,7 @@ func parse(input string) *guardMap {
 		case '.':
 			xPos++
 		case '#':
-			gMap.obstacles = append(gMap.obstacles, xyCoord{
+			nm.obstacles = append(nm.obstacles, xyCoord{
 				x: xPos,
 				y: maxY,
 			})
@@ -60,14 +56,13 @@ func parse(input string) *guardMap {
 			//fmt.Printf("found obstacle at (%d,%d)\n", xPos, maxY)
 			xPos++
 		case '^', '>', 'v', '<':
-			gMap.guard.start = xyCoord{
+			nm.guardStart = xyCoord{
 				x: xPos,
 				y: maxY,
 			}
 
-			gMap.guard.loc = gMap.guard.start
-			gMap.guard.startFacing = parseGuardDirection(chr)
-			gMap.guard.facing = gMap.guard.startFacing
+			nm.guardFacing = parseGuardDirection(chr)
+
 			xPos++
 		case '\n':
 			maxY++
@@ -83,7 +78,7 @@ func parse(input string) *guardMap {
 
 	}
 
-	gMap.maxCoord = xyCoord{maxX, maxY}
+	nm.maxCoord = xyCoord{maxX, maxY}
 
-	return gMap
+	return nm
 }

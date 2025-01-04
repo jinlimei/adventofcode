@@ -8,8 +8,18 @@ type theGuard struct {
 	start       xyCoord
 	loc         xyCoord
 	steps       int
-	facing      guardDirection
-	startFacing guardDirection
+	facing      direction
+	startFacing direction
+}
+
+func newGuard(start xyCoord, facing direction) *theGuard {
+	return &theGuard{
+		start:       start,
+		loc:         start,
+		steps:       0,
+		facing:      facing,
+		startFacing: facing,
+	}
 }
 
 func (tg *theGuard) coordsInFront() xyCoord {
@@ -27,6 +37,10 @@ func (tg *theGuard) coordsInFront() xyCoord {
 	}
 }
 
+func (tg *theGuard) turnRight() {
+	tg.facing = tg.facing.turnRight()
+}
+
 func (tg *theGuard) String() string {
 	return fmt.Sprintf(
 		"start=%s facing %s,current=%s facing %s",
@@ -37,58 +51,8 @@ func (tg *theGuard) String() string {
 	)
 }
 
-func (tg *theGuard) clone() *theGuard {
-	return &theGuard{
-		start:       tg.start.clone(),
-		loc:         tg.loc.clone(),
-		steps:       tg.steps,
-		facing:      tg.facing,
-		startFacing: tg.startFacing,
-	}
-}
-
 func (tg *theGuard) reset() {
 	tg.loc = tg.start
 	tg.facing = tg.startFacing
 	tg.steps = 0
-}
-
-type guardDirection uint8
-
-const (
-	facingUnknown guardDirection = iota
-	facingNorth
-	facingEast
-	facingSouth
-	facingWest
-)
-
-func (gd guardDirection) String() string {
-	switch gd {
-	case facingNorth:
-		return "^"
-	case facingEast:
-		return ">"
-	case facingSouth:
-		return "v"
-	case facingWest:
-		return "<"
-	default:
-		panic("invalid guardDirection")
-	}
-}
-
-func (gd guardDirection) turnRight() guardDirection {
-	switch gd {
-	case facingNorth:
-		return facingEast
-	case facingEast:
-		return facingSouth
-	case facingSouth:
-		return facingWest
-	case facingWest:
-		return facingNorth
-	default:
-		panic("invalid guardDirection")
-	}
 }

@@ -128,19 +128,19 @@ func (d Day) Part1Prompt() {
 ......#...
 `
 
-	gMap := parse(rawMap)
+	nm := parse(rawMap)
 
-	//spew.Dump(gMap)
+	//spew.Dump(nm)
 
-	gMap.visualize()
+	nm.visualize()
 
 	fmt.Println("\nTRAVERSING:")
 
-	gMap.traverse()
+	w := initWalk(nm)
+	w.traverse()
+	w.visualize()
 
-	gMap.visualize()
-
-	fmt.Printf("\nGuard Walked to %d Distinct Spots\n", gMap.distinctPositions())
+	fmt.Printf("\nGuard Walked to %d Distinct Spots\n", w.distinctPositions())
 }
 
 func (d Day) Part1Actual() {
@@ -150,15 +150,13 @@ func (d Day) Part1Actual() {
 		panic(err)
 	}
 
-	gMap := parse(input)
+	nm := parse(input)
 
-	fmt.Printf("Max Map is %s\n", gMap.maxCoord.String())
+	fmt.Printf("Max Map is %s\n", nm.maxCoord.String())
 
-	//gMap.visualize()
+	w := initWalk(nm)
+	w.traverse()
+	w.visualize()
 
-	gMap.traverse()
-
-	gMap.visualize()
-
-	fmt.Printf("\nGuard Walked to %d Distinct Spots\n", gMap.distinctPositions())
+	fmt.Printf("\nGuard Walked to %d Distinct Spots\n", w.distinctPositions())
 }

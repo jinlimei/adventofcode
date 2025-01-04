@@ -128,20 +128,25 @@ func (d Day) Part2Prompt() {
 ......#...
 `
 
-	gMap := parse(rawMap)
+	nm := parse(rawMap)
 
-	//spew.Dump(gMap)
+	//spew.Dump(nm)
 
-	gMap.visualize()
+	nm.visualize()
 
 	fmt.Println("\nTRAVERSING:")
 
-	gMap.findLoopObstacles()
+	obs := generateListOfObstacles(nm)
 
-	fmt.Println()
+	fmt.Println("OBSTACLES:")
+	fmt.Println(obs)
 
-	gMap.visualize()
+	nm.foundTemps = obs
+	nm.tempObstacle = nil
 
+	nm.visualize()
+
+	fmt.Printf("Found '%d' obstacles\n", len(obs))
 }
 
 func (d Day) Part2Actual() {
@@ -151,15 +156,16 @@ func (d Day) Part2Actual() {
 		panic(err)
 	}
 
-	gMap := parse(input)
+	nm := parse(input)
 
-	fmt.Printf("Max Map is %s\n", gMap.maxCoord.String())
+	fmt.Printf("Max Map is %s\n", nm.maxCoord.String())
 
-	//gMap.visualize()
+	obs := generateListOfObstacles(nm)
 
-	gMap.findLoopObstacles()
+	nm.foundTemps = obs
+	nm.tempObstacle = nil
 
-	gMap.visualize()
+	nm.visualize()
 
-	fmt.Printf("\nWe can temporally apply %d obstacles\n", len(gMap.tempObstacles))
+	fmt.Printf("Found '%d' obstacles\n", len(obs))
 }
