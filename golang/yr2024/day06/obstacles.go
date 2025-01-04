@@ -25,11 +25,17 @@ func generateListOfObstacles(nm *nMap) []xyCoord {
 		// We're creating a temp obstacle
 		nm.tempObstacle = xy.clone()
 
+		if coordInSlice(nm.tempObstacle, loopCoords) {
+			nm.tempObstacle = nil
+			continue
+		}
+
 		w := initWalk(nm)
 		err := w.traverse()
 
 		if errors.Is(err, ErrInLoop) {
 			//fmt.Printf(" FOUND LOOP!\n")
+
 			loopCoords = append(loopCoords, *nm.tempObstacle)
 			nm.tempObstacle = nil
 		} else if err != nil {
@@ -44,4 +50,23 @@ func generateListOfObstacles(nm *nMap) []xyCoord {
 	}
 
 	return loopCoords
+}
+
+func coordInSlice(c *xyCoord, slice []xyCoord) bool {
+	if c == nil {
+		return false
+	}
+
+	var (
+		sLen = len(slice)
+		pos  = 0
+	)
+
+	for ; pos < sLen; pos++ {
+		if slice[pos].Equals(*c) {
+			return true
+		}
+	}
+
+	return false
 }
