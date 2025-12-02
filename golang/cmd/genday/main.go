@@ -8,11 +8,22 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run ./cmd/genday [day]")
+		fmt.Println("Usage: go run ./cmd/genday [year] [day]")
 		return
 	}
 
-	day := os.Args[1]
+	year := os.Args[1]
+	yearInt, err := strconv.Atoi(year)
+	if err != nil {
+		panic(err)
+	}
+
+	if yearInt < 2000 || yearInt > 3000 {
+		fmt.Println("year must be between 2000 and 3000 (lmao)")
+		return
+	}
+
+	day := os.Args[2]
 	dayInt, err := strconv.Atoi(day)
 
 	if err != nil {
@@ -24,7 +35,7 @@ func main() {
 		return
 	}
 
-	err = establishDay(dayInt)
+	err = establishDay(yearInt, dayInt)
 	if err != nil {
 		panic(err)
 	}

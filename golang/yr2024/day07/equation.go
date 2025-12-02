@@ -1,5 +1,7 @@
 package day07
 
+import "log"
+
 type equationOp uint8
 
 const validOpsCount = 2
@@ -70,6 +72,7 @@ func (eq *equation) solve() {
 
 		for k := 0; k < validOpsCount; k++ {
 			start := vOps[k].Exec(n1, n2)
+			log.Printf("test: %v", start)
 
 			for i := pos; i < nLen-1; i++ {
 				n1 = eq.nums[i]

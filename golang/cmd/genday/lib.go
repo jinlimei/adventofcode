@@ -32,8 +32,8 @@ func makeFile(path, contents string) error {
 	return nil
 }
 
-func establishDay(day int) error {
-	dayDir := fmt.Sprintf("yr2024/day%02d", day)
+func establishDay(year, day int) error {
+	dayDir := fmt.Sprintf("yr%04d/day%02d", year, day)
 
 	if dirExists(dayDir) {
 		return fmt.Errorf("%s already exists", dayDir)
