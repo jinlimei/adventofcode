@@ -22,10 +22,10 @@ L82
 `
 
 	rules := parseRotationFile(testInput)
-	final, _, clickZeroes := runRotations(rules)
+	final, clickZeroes := runClickRotations(rules)
 
-	log.Printf("Zeroes: %02d", clickZeroes)
-	log.Printf("Final: %02d", final)
+	log.Printf("Zeroes: %d", clickZeroes)
+	log.Printf("Final: %d", final)
 }
 
 func (d Day) Part2Actual() {
@@ -37,6 +37,6 @@ func (d Day) Part2Actual() {
 	rules := parseRotationFile(input)
 	log.Printf("retrieved %d rules", len(rules))
 
-	final, _, clickZeroes := runRotations(rules)
+	final, clickZeroes := runClickRotations(rules)
 	log.Printf("final result is %d, click zeroes %d", final, clickZeroes)
 }

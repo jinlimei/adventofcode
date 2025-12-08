@@ -95,3 +95,78 @@ func runRotations(rules []DialRule) (int, int, int) {
 
 	return dial, zeroes, clickZeroes
 }
+
+func runClickRotations(rules []DialRule) (int, int) {
+	var (
+		dial   = dialStartPosition
+		zeroes = 0
+	)
+
+	fmt.Printf("dial at %d\n", dial)
+
+	for _, rule := range rules {
+		var (
+			start  = dial
+			clicks = 0
+			addl   = 0
+
+			flags []string
+		)
+
+		if rule.Rotate >= maxDial {
+			flags = append(flags, fmt.Sprintf("C0/%02.2f/%d", float64(rule.Rotate)/float64(maxDial), int(rule.Rotate/maxDial)-1))
+			addl = int(rule.Rotate/maxDial) - 1
+		}
+
+		switch rule.Direction {
+		case DirectionL:
+			dial = dial - rule.Rotate
+			if dial <= 0 {
+				magnitude := int(rule.Rotate/maxDial) + 1
+				dial = ((maxDial * magnitude) + dial) % maxDial
+
+				if start != 0 {
+					flags = append(flags, fmt.Sprintf("C1/%d", dial))
+					clicks++
+				}
+			} else if dial >= maxDial {
+				dial = dial % maxDial
+
+				if start != 0 {
+					flags = append(flags, fmt.Sprintf("C2/%d", dial))
+					clicks++
+				}
+			}
+		case DirectionR:
+			dial = dial + rule.Rotate
+			if dial > maxDial && start != 0 {
+				flags = append(flags, fmt.Sprintf("C3/%d", dial))
+				clicks++
+			}
+
+			if dial >= maxDial {
+				dial = dial % maxDial
+			}
+		}
+
+		if dial == 0 && clicks == 0 {
+			flags = append(flags, fmt.Sprintf("C4/%d", dial))
+			clicks++
+		}
+
+		flagOut := ""
+		if len(flags) > 0 {
+			flagOut = fmt.Sprintf(" (flags %s)", strings.Join(flags, " "))
+		}
+		fmt.Printf("rotated %s%d to be %d%s\n",
+			rule.Direction.String(),
+			rule.Rotate,
+			dial,
+			flagOut,
+		)
+
+		zeroes += clicks + addl
+	}
+
+	return dial, zeroes
+}
