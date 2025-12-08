@@ -2,6 +2,7 @@ package day01
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -59,11 +60,10 @@ func parseRotationFile(str string) []DialRule {
 	return rules
 }
 
-func runRotations(rules []DialRule) (int, int, int) {
+func runRotations(rules []DialRule) (int, int) {
 	dial := dialStartPosition
 
 	zeroes := 0
-	clickZeroes := 0
 
 	for _, rule := range rules {
 		fmt.Printf("dial at %02d - ", dial)
@@ -76,7 +76,7 @@ func runRotations(rules []DialRule) (int, int, int) {
 			// the way we want it to, thus we do this to make sure we return
 			// to the positive number space.
 			if dial <= 0 {
-				dial = maxDial + dial
+				dial = (maxDial + dial) % maxDial
 			}
 		case DirectionR:
 			dial = dial + rule.Rotate
@@ -93,7 +93,7 @@ func runRotations(rules []DialRule) (int, int, int) {
 		}
 	}
 
-	return dial, zeroes, clickZeroes
+	return dial, zeroes
 }
 
 func runClickRotations(rules []DialRule) (int, int) {
@@ -115,7 +115,7 @@ func runClickRotations(rules []DialRule) (int, int) {
 
 		if rule.Rotate >= maxDial {
 			flags = append(flags, fmt.Sprintf("C0/%02.2f/%d", float64(rule.Rotate)/float64(maxDial), int(rule.Rotate/maxDial)-1))
-			addl = int(rule.Rotate/maxDial) - 1
+			addl = int(math.Floor(float64(rule.Rotate)/float64(maxDial))) - 1
 		}
 
 		switch rule.Direction {
@@ -151,6 +151,7 @@ func runClickRotations(rules []DialRule) (int, int) {
 		if len(flags) > 0 {
 			flagOut = fmt.Sprintf(" (flags %s)", strings.Join(flags, " "))
 		}
+
 		fmt.Printf("rotated %s%d to be %d%s\n",
 			rule.Direction.String(),
 			rule.Rotate,

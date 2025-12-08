@@ -22,7 +22,7 @@ L82
 `
 
 	rules := parseRotationFile(testInput)
-	final, zeroes, _ := runRotations(rules)
+	final, zeroes := runRotations(rules)
 
 	log.Printf("Zeroes: %02d", zeroes)
 	log.Printf("Final: %02d", final)
@@ -37,6 +37,6 @@ func (d Day) Part1Actual() {
 	rules := parseRotationFile(input)
 	log.Printf("retrieved %d rules", len(rules))
 
-	final, zeroes, _ := runRotations(rules)
+	final, zeroes := runRotations(rules)
 	log.Printf("final result is %d, zeroes %d", final, zeroes)
 }
