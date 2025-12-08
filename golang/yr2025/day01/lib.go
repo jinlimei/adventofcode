@@ -129,13 +129,6 @@ func runClickRotations(rules []DialRule) (int, int) {
 					flags = append(flags, fmt.Sprintf("C1/%d", dial))
 					clicks++
 				}
-			} else if dial >= maxDial {
-				dial = dial % maxDial
-
-				if start != 0 {
-					flags = append(flags, fmt.Sprintf("C2/%d", dial))
-					clicks++
-				}
 			}
 		case DirectionR:
 			dial = dial + rule.Rotate
