@@ -102,6 +102,8 @@ func runClickRotations(rules []DialRule) (int, int) {
 		zeroes = 0
 	)
 
+	allCZeros := make([]string, 0)
+
 	fmt.Printf("dial at %d\n", dial)
 
 	for _, rule := range rules {
@@ -114,8 +116,15 @@ func runClickRotations(rules []DialRule) (int, int) {
 		)
 
 		if rule.Rotate >= maxDial {
-			flags = append(flags, fmt.Sprintf("C0/%02.2f/%d", float64(rule.Rotate)/float64(maxDial), int(rule.Rotate/maxDial)-1))
-			addl = int(math.Floor(float64(rule.Rotate)/float64(maxDial))) - 1
+			addl = int(math.Floor(float64(rule.Rotate) / float64(maxDial)))
+
+			cZero := fmt.Sprintf("C0/%02.2f/%d", float64(rule.Rotate)/float64(maxDial), addl)
+
+			flags = append(flags, cZero)
+			allCZeros = append(allCZeros, cZero)
+
+			//fmt.Printf("Changed rule.Rotate from %d to %d (using addl=%d)\n", rule.Rotate, rule.Rotate-(maxDial*addl), addl)
+			rule.Rotate = rule.Rotate - (maxDial * addl)
 		}
 
 		switch rule.Direction {
@@ -160,6 +169,10 @@ func runClickRotations(rules []DialRule) (int, int) {
 		)
 
 		zeroes += clicks + addl
+	}
+
+	for _, zero := range allCZeros {
+		fmt.Println(zero)
 	}
 
 	return dial, zeroes
